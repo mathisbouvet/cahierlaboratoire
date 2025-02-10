@@ -6,6 +6,38 @@
     <title>Cahier de Laboratoire</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.0.0/dist/tailwind.min.css" rel="stylesheet">
     <style>
+                /* Styles du tableau blanc */
+                .whiteboard-section {
+            background-color: #f7f7f7;
+            border: 2px solid #ccc;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 20px;
+            width: 80%;
+            max-width: 800px;
+            box-sizing: border-box;
+        }
+
+        .whiteboard-section textarea {
+            background-color: #ffffff;
+            border: 1px solid #ccc;
+            width: 100%;
+            padding: 10px;
+            font-size: 16px;
+            border-radius: 8px;
+            height: 200px;
+            color: #333;
+        }
+
+        .whiteboard-section h3 {
+            font-size: 22px;
+            margin-bottom: 10px;
+        }
+
+        .whiteboard-section p {
+            font-size: 14px;
+            margin-bottom: 15px;
+        }
         body {
             font-family: Arial, sans-serif;
             margin: 0;
@@ -179,13 +211,14 @@
             color: #888;
         }
 
+
         /* Rappel */
         .reminder-container {
             display: flex;
+            margin-top: 100px;
             justify-content: center;
             gap: 15px;
             flex-wrap: wrap;
-            margin-top: 20px;
         }
 
         .reminder {
@@ -207,7 +240,6 @@
             font-size: 14px;
             color: #666;
         }
-
         .reminder:hover {
             transform: translateY(-5px);
             box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
@@ -232,7 +264,9 @@
             from { opacity: 0; top: -50px; }
             to { opacity: 1; top: 10px; }
         }
-
+        .reminder-container {
+    margin-top: 50px; /* Espace entre la section des activités et des rappels */
+}
     </style>
 </head>
 <body>
@@ -292,6 +326,14 @@
                 <button onclick="window.location.href='situation.html'" style="background-color: #4caf50; color: white; padding: 10px 20px; border-radius: 8px; margin-top: 20px; cursor: pointer;">Voir la situation des échantillons</button>
             </div>
         </div>
+        <div class="container">
+            <!-- Tableau blanc -->
+            <div class="whiteboard-section">
+                <h3>Tableau Blanc</h3>
+                <p>Utilisez cet espace pour écrire librement. Le contenu sera sauvegardé automatiquement.</p>
+                <textarea id="whiteboard" placeholder="Écrivez ici..." rows="10"></textarea>
+            </div>
+
     </div>
 
     <script>
@@ -491,6 +533,21 @@ function deleteActivity(index) {
     localStorage.setItem("activities", JSON.stringify(activities));
     loadEntries(); // Recharger la liste après suppression
 }
+
+// Charger le contenu sauvegardé du tableau blanc
+window.addEventListener('DOMContentLoaded', () => {
+            const whiteboard = document.getElementById('whiteboard');
+            const savedContent = localStorage.getItem('whiteboardContent');
+            if (savedContent) {
+                whiteboard.value = savedContent; // Restaurer le contenu du localStorage
+            }
+        });
+
+        // Sauvegarder le contenu du tableau blanc dans le localStorage
+        const whiteboard = document.getElementById('whiteboard');
+        whiteboard.addEventListener('input', () => {
+            localStorage.setItem('whiteboardContent', whiteboard.value); // Sauvegarder à chaque modification
+        });
 
 
 
