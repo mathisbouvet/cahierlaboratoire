@@ -15,13 +15,15 @@
             const solution = document.getElementById("solution").value;
             const date = document.getElementById("situationDate").value;
             const description = document.getElementById("description").value; // Nouveau champ description
+            const project = document.getElementById("project").value; // Récupérer le projet
+            const projectColor = document.getElementById("projectColor").value; // Récupérer la couleur du projet
 
-            if (!sampleName || !location || !solution || !date) {
+            if (!sampleName || !location || !solution || !date || !project || !projectColor) {
                 alert("Veuillez remplir tous les champs.");
                 return;
             }
 
-            const situation = { sampleName, location, solution, date, description }; // Ajouter description
+            const situation = { sampleName, location, solution, date, description, project, projectColor }; // Ajouter projet et couleur
 
             let situations = JSON.parse(localStorage.getItem("situations")) || [];
 
@@ -40,7 +42,10 @@
             document.getElementById("location").value = "";
             document.getElementById("solution").value = "";
             document.getElementById("situationDate").value = "";
-            document.getElementById("description").value = ""; // Réinitialiser description
+            document.getElementById("description").value = "";
+            document.getElementById("project").value = ""; // Réinitialiser projet
+            document.getElementById("projectColor").value = "#ffffff"; // Réinitialiser couleur
+
             editIndex = null; // Réinitialiser l'index de modification
             loadSituations(); // Charger à nouveau les situations
         }
@@ -63,12 +68,13 @@
                 const elapsed = timeElapsed(situation.date);
                 const li = document.createElement("li");
                 li.innerHTML = `
-                    <div class="bg-indigo-100 shadow-lg rounded-lg p-6 mb-4">
+                    <div class="bg-indigo-100 shadow-lg rounded-lg p-6 mb-4" style="border-left: 8px solid ${situation.projectColor};">
                         <h4 class="text-lg font-semibold text-indigo-800">${situation.sampleName}</h4>
                         <p class="text-sm text-gray-700"><strong>Emplacement:</strong> ${situation.location}</p>
                         <p class="text-sm text-gray-700"><strong>Solution:</strong> ${situation.solution}</p>
                         <p class="text-sm text-gray-700"><strong>État:</strong> ${elapsed}</p>
-                        <p class="text-sm text-gray-700" title="${situation.description}"><strong>Description:</strong> ${situation.description}</p> <!-- Infobulle pour la description -->
+                        <p class="text-sm text-gray-700" title="${situation.description}"><strong>Description:</strong> ${situation.description}</p>
+                        <p class="text-sm text-gray-700"><strong>Projet:</strong> ${situation.project}</p> <!-- Afficher le projet -->
                         <button onclick="editSituation(${index})" class="mt-2 px-4 py-2 bg-yellow-400 text-white rounded-lg hover:bg-yellow-500 focus:outline-none focus:ring-2 focus:ring-yellow-400">Modifier</button>
                         <button onclick="deleteSituation(${index})" class="mt-2 px-4 py-2 bg-red-400 text-white rounded-lg hover:bg-red-500 focus:outline-none focus:ring-2 focus:ring-red-400 ml-2">Supprimer</button>
                     </div>
@@ -87,6 +93,8 @@
             document.getElementById("solution").value = situation.solution;
             document.getElementById("situationDate").value = situation.date;
             document.getElementById("description").value = situation.description; // Charger la description
+            document.getElementById("project").value = situation.project; // Charger le projet
+            document.getElementById("projectColor").value = situation.projectColor; // Charger la couleur du projet
 
             editIndex = index; // Enregistrer l'index de la situation à modifier
         }
@@ -134,6 +142,14 @@
             <div>
                 <label for="description" class="block text-sm font-medium text-gray-700">Description :</label>
                 <textarea id="description" class="block w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="Décrivez brièvement l'échantillon"></textarea>
+            </div>
+            <div>
+                <label for="project" class="block text-sm font-medium text-gray-700">Projet :</label>
+                <input type="text" id="project" class="block w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+            </div>
+            <div>
+                <label for="projectColor" class="block text-sm font-medium text-gray-700">Couleur du projet :</label>
+                <input type="color" id="projectColor" class="block w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" />
             </div>
             <div class="flex justify-center">
                 <button onclick="saveSampleSituation()" class="px-6 py-3 bg-indigo-500 text-white font-semibold rounded-lg shadow-md hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-500">

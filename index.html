@@ -273,6 +273,8 @@
     <header>
         Cahier de Laboratoire
     </header>
+<!-- Section pour ajouter un échantillon -->
+
 
     <div class="container">
         <!-- Section des rappels en haut -->
@@ -291,6 +293,9 @@
                     <label for="date">Date :</label>
                     <input type="date" id="date" value="" />
                     <br>
+                    <label for="Times">Heure :</label>
+                    <input type="time" id="Times" value="" />
+                    <br>                    
                     <label for="activityType">Type d'activité :</label>
                     <select id="activityType" onchange="toggleGroupSelection()">
                         <option value="Solution">Solution</option>
@@ -318,7 +323,12 @@
                     <button id="showMoreBtn" onclick="showMoreEntries()">Voir plus</button>
                 </div>
             </div>
-
+            <div id="sampleSelectionContainer" style="display: none;">
+                <label for="sampleSelection">Sélectionner un échantillon :</label>
+                <select id="sampleSelection">
+                    <!-- Les échantillons seront chargés ici -->
+                </select>
+            </div>
             <!-- Section des échantillons -->
             <div class="right-panel" id="sampleStatusContainer">
                 <h3>Situation des Échantillons</h3>
@@ -410,68 +420,70 @@
 
         // Charger et afficher les situations des échantillons
         function loadSampleStatus() {
-            const sampleStatusContainer = document.getElementById("sampleBoxes");
-            const situations = JSON.parse(localStorage.getItem("situations")) || [];
+    const sampleStatusContainer = document.getElementById("sampleBoxes");
+    const situations = JSON.parse(localStorage.getItem("situations")) || [];
 
-            sampleStatusContainer.innerHTML = '';
+    sampleStatusContainer.innerHTML = '';
 
-            situations.forEach(situation => {
-                const sampleCard = document.createElement("div");
-                sampleCard.classList.add("sample-card");
+    situations.forEach(situation => {
+        const sampleCard = document.createElement("div");
+        sampleCard.classList.add("sample-card");
 
-                const timeInSolution = timeElapsed(situation.date);
+        const timeInSolution = timeElapsed(situation.date);
 
-                sampleCard.innerHTML = `
-                    <div class="sample-header">${situation.sampleName}</div>
-                    <div class="sample-details">
-                        <p><strong>Solution:</strong> ${situation.solution}</p>
-                        <p><strong>Emplacement:</strong> ${situation.location}</p>
-                        <p class="sample-time">${timeInSolution}</p>
-                    </div>
-                `;
-                sampleStatusContainer.appendChild(sampleCard);
-            });
-        }
+        // Ajouter la couleur du projet à la bordure de la carte d'échantillon
+        sampleCard.style.borderLeft = `8px solid ${situation.projectColor}`;
+
+        sampleCard.innerHTML = `
+            <div class="sample-header">${situation.sampleName}</div>
+            <div class="sample-details">
+                <p><strong>Solution:</strong> ${situation.solution}</p>
+                <p><strong>Emplacement:</strong> ${situation.location}</p>
+                <p class="sample-time">${timeInSolution}</p>
+                <p><strong>Projet:</strong> ${situation.project}</p> <!-- Afficher le nom du projet -->
+            </div>
+        `;
+        sampleStatusContainer.appendChild(sampleCard);
+    });
+}
+
 
         // Sauvegarder une nouvelle activité
         function saveEntry() {
-            const date = document.getElementById("date").value;
-            const activityType = document.getElementById("activityType").value;
-            const note = document.getElementById("note").value;
+    const date = document.getElementById("date").value;
+    const time = document.getElementById("Times").value;  // Utiliser l'ID "Times" ici
+    const activityType = document.getElementById("activityType").value;
+    const note = document.getElementById("note").value;
 
-            const activity = { date, type: activityType, note };
-            const activities = JSON.parse(localStorage.getItem("activities")) || [];
-            activities.push(activity);
-            localStorage.setItem("activities", JSON.stringify(activities));
+    console.log("Date:", date);
+    console.log("Time:", Times);
+    console.log("Activity Type:", activityType);
+    console.log("Note:", note);
 
-            loadEntries(); // Recharger les entrées après ajout
-        }
+    if (!date || !time || !activityType || !note) {
+        alert("Veuillez remplir tous les champs !");
+        return;
+    }
+
+    const activity = { 
+        date: date, 
+        time: time,  // Sauvegarde l'heure ici
+        type: activityType,
+        note: note
+    };
+
+    const activities = JSON.parse(localStorage.getItem("activities")) || [];
+    activities.push(activity);
+    localStorage.setItem("activities", JSON.stringify(activities));
+
+    loadEntries(); // Recharger les entrées après ajout
+}
+
+
+
+
 
         // Charger et afficher les entrées enregistrées
-        function loadEntries() {
-            const entriesContainer = document.getElementById("entries");
-            entriesContainer.innerHTML = "";
-
-            const activities = JSON.parse(localStorage.getItem("activities")) || [];
-
-            activities.forEach(activity => {
-                const entryDiv = document.createElement("div");
-                entryDiv.classList.add("activity-card");
-
-                const activityDate = new Date(activity.date).toLocaleDateString('fr-FR');
-                const activityTime = new Date(activity.date).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
-
-                entryDiv.innerHTML = `
-                    <div class="activity-header">${activity.type}</div>
-                    <div class="activity-details">
-                        <p><strong>Date:</strong> ${activityDate} ${activityTime}</p>
-                        <p><strong>Note:</strong> ${activity.note}</p>
-                    </div>
-                `;
-                entriesContainer.appendChild(entryDiv);
-            });
-        }
-
         function loadEntries() {
     const entriesContainer = document.getElementById("entries");
     entriesContainer.innerHTML = "";
@@ -483,12 +495,12 @@
         entryDiv.classList.add("activity-card");
 
         const activityDate = new Date(activity.date).toLocaleDateString('fr-FR');
-        const activityTime = new Date(activity.date).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+        const activityTime = activity.time || "Non spécifié";  // Affiche l'heure ou "Non spécifié"
 
         entryDiv.innerHTML = `
             <div class="activity-header">${activity.type}</div>
             <div class="activity-details">
-                <p><strong>Date:</strong> ${activityDate} ${activityTime}</p>
+                <p><strong>Date:</strong> ${activityDate} à ${activityTime}</p>
                 <p><strong>Note:</strong> ${activity.note}</p>
             </div>
             <div class="activity-actions">
@@ -548,9 +560,127 @@ window.addEventListener('DOMContentLoaded', () => {
         whiteboard.addEventListener('input', () => {
             localStorage.setItem('whiteboardContent', whiteboard.value); // Sauvegarder à chaque modification
         });
+        function createSample() {
+            const sampleName = prompt("Nom de l'échantillon ?");
+            const sampleDescription = prompt("Description de l'échantillon ?");
+            if (sampleName && sampleDescription) {
+                const newSample = { id: samples.length + 1, name: sampleName, description: sampleDescription };
+                samples.push(newSample);
+                loadSampleSelection(); // Recharger les échantillons
+            } else {
+                alert("Le nom et la description sont requis.");
+            }
+        }
 
+        // Liste des échantillons existants (cela pourrait venir d'une base de données ou du localStorage)
+        let samples = [
+            { id: 1, name: 'Échantillon 1', description: 'Sol humide' },
+            { id: 2, name: 'Échantillon 2', description: 'Eau de rivière' },
+        ];
 
+        // Fonction pour afficher les échantillons existants dans le select
+        function loadSampleSelection() {
+            const sampleSelect = document.getElementById('sampleSelection');
+            sampleSelect.innerHTML = '<option value="">Sélectionner un échantillon</option>'; // Réinitialiser les options
+            samples.forEach(sample => {
+                const option = document.createElement('option');
+                option.value = sample.id;
+                option.textContent = sample.name;
+                sampleSelect.appendChild(option);
+            });
+        }
 
+        // Fonction pour créer un nouvel échantillon
+        function createSample() {
+            const sampleName = prompt("Nom de l'échantillon ?");
+            const sampleDescription = prompt("Description de l'échantillon ?");
+            if (sampleName && sampleDescription) {
+                const newSample = { id: samples.length + 1, name: sampleName, description: sampleDescription };
+                samples.push(newSample);
+                loadSampleSelection(); // Recharger les échantillons
+            } else {
+                alert("Le nom et la description sont requis.");
+            }
+        }
+
+        // Fonction pour soumettre l'activité
+        function submitActivity() {
+            const activityDescription = document.getElementById('activityDescription').value;
+            const selectedSampleId = document.getElementById('sampleSelection').value;
+
+            if (selectedSampleId && activityDescription) {
+                const selectedSample = samples.find(sample => sample.id == selectedSampleId);
+                alert(`Activité sur l'échantillon "${selectedSample.name}" :\n${activityDescription}`);
+                // Ici, tu pourrais enregistrer l'activité dans une base de données ou une structure de stockage
+            } else {
+                alert("Veuillez sélectionner un échantillon et décrire l'activité.");
+            }
+        }
+
+        // Fonction pour gérer le changement de type d'activité
+        function handleActivityTypeChange() {
+            const activityType = document.getElementById('activityType').value;
+            const sampleSection = document.getElementById('sampleSection');
+            
+            if (activityType === "sample") {
+                sampleSection.style.display = "block"; // Afficher la section des échantillons
+                loadSampleSelection(); // Charger les échantillons
+            } else {
+                sampleSection.style.display = "none"; // Cacher la section des échantillons
+            }
+        }
+        function toggleGroupSelection() {
+    const activityType = document.getElementById("activityType").value;
+    const sampleSelectionSection = document.getElementById("sampleSelectionSection");
+    
+    if (activityType === "Echantillon") {
+        // Afficher la section de sélection des échantillons
+        sampleSelectionSection.style.display = "block";
+        loadSampleSelection();  // Charger les échantillons dans le select
+    } else {
+        // Cacher la section de sélection des échantillons si ce n'est pas un échantillon
+        sampleSelectionSection.style.display = "none";
+    }
+}
+function loadSampleSelection() {
+    const sampleSelect = document.getElementById('sampleSelection');
+    sampleSelect.innerHTML = '<option value="">Sélectionner un échantillon</option>'; // Réinitialiser les options
+    
+    // Afficher les échantillons existants dans le sélecteur
+    samples.forEach(sample => {
+        const option = document.createElement('option');
+        option.value = sample.id;
+        option.textContent = sample.name;
+        sampleSelect.appendChild(option);
+    });
+}
+
+// Appel initial pour charger les échantillons quand la page est prête
+document.addEventListener("DOMContentLoaded", () => {
+    loadSampleSelection();
+});
+function saveEntry() {
+    const date = document.getElementById("date").value;
+    const activityType = document.getElementById("activityType").value;
+    const note = document.getElementById("note").value;
+    const sampleId = document.getElementById("sampleSelection").value;  // Récupérer l'échantillon sélectionné
+
+    let activityDescription = note;
+
+    if (activityType === "Echantillon" && sampleId) {
+        const sample = samples.find(sample => sample.id == sampleId);
+        if (sample) {
+            activityDescription += `\n\nÉchantillon utilisé : ${sample.name} - ${sample.description}`;
+        }
+    }
+
+    const activity = { date, type: activityType, note: activityDescription };
+    const activities = JSON.parse(localStorage.getItem("activities")) || [];
+    activities.push(activity);
+    localStorage.setItem("activities", JSON.stringify(activities));
+
+    loadEntries(); // Recharger les entrées après ajout
+}
 
     </script>
 </body>
