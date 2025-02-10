@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Situation des Échantillons</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.0.0/dist/tailwind.min.css" rel="stylesheet">
+    <script>
+        let editIndex = null; // Variable pour savoir si on modifie une situation
+
+        // Sauvegarde ou modification de la situation d'un échantillon dans localStorage
+        function saveSampleSituation() {
+            const sampleName = document.getElementById("sampleName").value;
+            const location = document.getElementById("location").value;
+            const solution = document.getElementById("solution").value;
+            const date = document.getElementById("situationDate").value;
+            const description = document.getElementById("description").value; // Nouveau champ description
+
+            if (!sampleName || !location || !solution || !date) {
+                alert("Veuillez remplir tous les champs.");
+                return;
+            }
+
+            const situation = { sampleName, location, solution, date, description }; // Ajouter description
+
+            let situations = JSON.parse(localStorage.getItem("situations")) || [];
+
+            if (editIndex !== null) {
+                // Si on est en mode modification, on remplace l'élément
+                situations[editIndex] = situation;
+            } else {
+                // Sinon, on ajoute une nouvelle situation
+                situations.push(situation);
+            }
+
+            localStorage.setItem("situations", JSON.stringify(situations));
+
+            // Réinitialiser les champs du formulaire après ajout ou modification
+            document.getElementById("sampleName").value = "";
+            document.getElementById("location").value = "";
+            document.getElementById("solution").value = "";
+            document.getElementById("situationDate").value = "";
+            document.getElementById("description").value = ""; // Réinitialiser description
+            editIndex = null; // Réinitialiser l'index de modification
+            loadSituations(); // Charger à nouveau les situations
+        }
+
+        // Calculer le temps écoulé depuis une date
+        function timeElapsed(date) {
+            const now = new Date();
+            const elapsed = now - new Date(date);
+            const days = Math.floor(elapsed / (1000 * 60 * 60 * 24));
+            return `depuis ${days} jour${days > 1 ? 's' : ''}`;
+        }
+
+        // Charger et afficher les situations des échantillons
+        function loadSituations() {
+            const situationsUl = document.getElementById("situations");
+            situationsUl.innerHTML = "";
+            let situations = JSON.parse(localStorage.getItem("situations")) || [];
+
+            situations.forEach((situation, index) => {
+                const elapsed = timeElapsed(situation.date);
+                const li = document.createElement("li");
+                li.innerHTML = `
+                    <div class="bg-indigo-100 shadow-lg rounded-lg p-6 mb-4">
+                        <h4 class="text-lg font-semibold text-indigo-800">${situation.sampleName}</h4>
+                        <p class="text-sm text-gray-700"><strong>Emplacement:</strong> ${situation.location}</p>
+                        <p class="text-sm text-gray-700"><strong>Solution:</strong> ${situation.solution}</p>
+                        <p class="text-sm text-gray-700"><strong>État:</strong> ${elapsed}</p>
+                        <p class="text-sm text-gray-700" title="${situation.description}"><strong>Description:</strong> ${situation.description}</p> <!-- Infobulle pour la description -->
+                        <button onclick="editSituation(${index})" class="mt-2 px-4 py-2 bg-yellow-400 text-white rounded-lg hover:bg-yellow-500 focus:outline-none focus:ring-2 focus:ring-yellow-400">Modifier</button>
+                        <button onclick="deleteSituation(${index})" class="mt-2 px-4 py-2 bg-red-400 text-white rounded-lg hover:bg-red-500 focus:outline-none focus:ring-2 focus:ring-red-400 ml-2">Supprimer</button>
+                    </div>
+                `;
+                situationsUl.appendChild(li);
+            });
+        }
+
+        // Charger les données d'une situation pour modification dans le formulaire
+        function editSituation(index) {
+            const situations = JSON.parse(localStorage.getItem("situations")) || [];
+            const situation = situations[index];
+
+            document.getElementById("sampleName").value = situation.sampleName;
+            document.getElementById("location").value = situation.location;
+            document.getElementById("solution").value = situation.solution;
+            document.getElementById("situationDate").value = situation.date;
+            document.getElementById("description").value = situation.description; // Charger la description
+
+            editIndex = index; // Enregistrer l'index de la situation à modifier
+        }
+
+        // Supprimer une situation
+        function deleteSituation(index) {
+            let situations = JSON.parse(localStorage.getItem("situations")) || [];
+            situations.splice(index, 1); // Supprime l'élément à l'index spécifié
+            localStorage.setItem("situations", JSON.stringify(situations)); // Sauvegarder les changements dans localStorage
+            loadSituations(); // Recharger la liste des situations
+        }
+
+        // Mettre à jour les situations au démarrage
+        document.addEventListener("DOMContentLoaded", loadSituations);
+    </script>
+</head>
+<body class="bg-gray-50 p-6">
+
+    <div class="max-w-4xl mx-auto bg-white p-6 rounded-lg shadow-lg">
+        <!-- Logo -->
+        <div class="flex justify-center mb-6">
+            <img src="logo.png" alt="Logo" class="w-32 h-auto"> <!-- Remplacez "logo.png" par le chemin de votre logo -->
+        </div>
+
+        <h2 class="text-2xl font-bold mb-6 text-center text-indigo-700">Situation des Échantillons</h2>
+
+        <!-- Formulaire pour ajouter ou modifier une situation d'échantillon -->
+        <div class="space-y-4">
+            <div>
+                <label for="sampleName" class="block text-sm font-medium text-gray-700">Nom de l'échantillon :</label>
+                <input type="text" id="sampleName" class="block w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+            </div>
+            <div>
+                <label for="location" class="block text-sm font-medium text-gray-700">Emplacement :</label>
+                <input type="text" id="location" class="block w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+            </div>
+            <div>
+                <label for="solution" class="block text-sm font-medium text-gray-700">Solution :</label>
+                <input type="text" id="solution" class="block w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+            </div>
+            <div>
+                <label for="situationDate" class="block text-sm font-medium text-gray-700">Date :</label>
+                <input type="date" id="situationDate" class="block w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+            </div>
+            <div>
+                <label for="description" class="block text-sm font-medium text-gray-700">Description :</label>
+                <textarea id="description" class="block w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="Décrivez brièvement l'échantillon"></textarea>
+            </div>
+            <div class="flex justify-center">
+                <button onclick="saveSampleSituation()" class="px-6 py-3 bg-indigo-500 text-white font-semibold rounded-lg shadow-md hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                    ${editIndex !== null ? 'Mettre à jour la situation' : 'Enregistrer la situation'}
+                </button>
+            </div>
+        </div>
+
+        <!-- Liste des situations enregistrées -->
+        <h3 class="mt-6 text-xl font-semibold text-gray-700">Situations enregistrées</h3>
+        <ul id="situations" class="mt-4 space-y-4">
+            <!-- Liste des situations ajoutées -->
+        </ul>
+
+        <!-- Bouton pour revenir à la page principale -->
+        <div class="mt-6 text-center">
+            <a href="index.html" class="px-6 py-3 bg-green-500 text-white font-semibold rounded-lg shadow-md hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500">Retour à la page principale</a>
+        </div>
+    </div>
+
+</body>
+</html>

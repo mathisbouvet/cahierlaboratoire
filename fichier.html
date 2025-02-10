@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cahier de Laboratoire</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.0.0/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f7f9fc;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        header {
+            background-color: #7f9eff; /* Bleu pastel */
+            color: white;
+            padding: 20px;
+            text-align: center;
+            font-size: 24px;
+            border-bottom: 2px solid #dce1f3;
+            width: 100%;
+        }
+
+        .container {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            max-width: 1100px;
+            padding: 20px;
+        }
+
+        /* Section du répertoire de fichiers */
+        .file-directory {
+            background-color: #f1f9f7; /* Vert menthe pastel */
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 20px;
+            width: 300px;
+            margin-right: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            gap: 10px;
+            min-height: 300px;
+        }
+
+        .file-directory h3 {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        .file-drop-zone {
+            border: 2px dashed #7f9eff;
+            border-radius: 8px;
+            padding: 30px;
+            background-color: #ffffff;
+            text-align: center;
+            cursor: pointer;
+            color: #7f9eff;
+        }
+
+        .file-list {
+            margin-top: 20px;
+            list-style-type: none;
+            padding: 0;
+        }
+
+        .file-list li {
+            padding: 5px;
+            background-color: #f4f7fc;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        /* Section principale */
+        .note-section {
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            margin-bottom: 20px;
+            width: 100%;
+        }
+
+        textarea {
+            width: 100%;
+            height: 120px;
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            font-size: 16px;
+            background-color: #f4f7fc;
+        }
+
+        select, input[type="date"], button {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            font-size: 16px;
+            width: 100%;
+        }
+
+        button {
+            cursor: pointer;
+            background-color: #7f9eff; /* Bleu clair pastel */
+            color: white;
+            border: none;
+            margin-top: 10px;
+        }
+
+        button:hover {
+            background-color: #4d88ff; /* Changement de couleur au survol */
+        }
+
+    </style>
+</head>
+<body>
+    <header>
+        Cahier de Laboratoire
+    </header>
+
+    <div class="container">
+        <!-- Répertoire de fichiers (box à gauche) -->
+        <div class="file-directory">
+            <h3>Répertoire de fichiers annexes</h3>
+            <div class="file-drop-zone" id="fileDropZone" ondrop="dropHandler(event)" ondragover="dragOverHandler(event)">
+                Glissez vos fichiers ici
+            </div>
+
+            <ul class="file-list" id="fileList">
+                <!-- Liste des fichiers déposés -->
+            </ul>
+        </div>
+
+        <!-- Section principale des activités et échantillons -->
+        <div class="note-section">
+            <h3>Enregistrement d'Activités</h3>
+            <label for="date">Date :</label>
+            <input type="date" id="date" value="" />
+            <br>
+            <label for="activityType">Type d'activité :</label>
+            <select id="activityType">
+                <option value="Solution">Solution</option>
+                <option value="Echantillon">Échantillon</option>
+                <option value="Bibliographie">Bibliographie</option>
+                <option value="Groupe">Groupe de travail</option>
+            </select>
+            <br>
+            <label for="note">Note :</label>
+            <textarea id="note" placeholder="Décrivez vos activités..."></textarea>
+            <br>
+            <button onclick="saveEntry()">Enregistrer</button>
+        </div>
+    </div>
+
+    <script>
+        // Fonction pour gérer le glisser-déposer de fichiers
+        function dragOverHandler(event) {
+            event.preventDefault();  // Permet au navigateur de traiter le dépôt
+        }
+
+        function dropHandler(event) {
+            event.preventDefault();  // Empêche le comportement par défaut du navigateur (par ex. ouverture du fichier)
+
+            const files = event.dataTransfer.files;
+            const fileList = document.getElementById("fileList");
+
+            // Afficher les fichiers dans la liste
+            for (let i = 0; i < files.length; i++) {
+                const listItem = document.createElement("li");
+                listItem.textContent = files[i].name;
+                fileList.appendChild(listItem);
+            }
+        }
+
+        // Fonction pour enregistrer une activité (à compléter selon votre logique)
+        function saveEntry() {
+            alert("Activité enregistrée !");
+        }
+
+        // Fonction pour définir la date d'aujourd'hui
+        function setTodayDate() {
+            const today = new Date().toISOString().split("T")[0];
+            document.getElementById("date").value = today;
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+            setTodayDate();
+        });
+    </script>
+</body>
+</html>

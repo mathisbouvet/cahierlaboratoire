@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Situation des Échantillons</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.0.0/dist/tailwind.min.css" rel="stylesheet">
+    <script>
+        // Sauvegarde de la situation des échantillons dans localStorage
+        function saveSampleSituation() {
+            const sampleName = document.getElementById("sampleName").value;
+            const location = document.getElementById("location").value;
+            const solution = document.getElementById("solution").value;
+            const date = document.getElementById("situationDate").value;
+
+            if (!sampleName || !location || !solution || !date) {
+                alert("Veuillez remplir tous les champs.");
+                return;
+            }
+
+            const situation = { sampleName, location, solution, date };
+            let situations = JSON.parse(localStorage.getItem("situations")) || [];
+            situations.push(situation);
+            localStorage.setItem("situations", JSON.stringify(situations));
+
+            document.getElementById("sampleName").value = "";
+            document.getElementById("location").value = "";
+            document.getElementById("solution").value = "";
+            document.getElementById("situationDate").value = "";
+            loadSituations();
+        }
+
+        // Calculer le temps écoulé depuis une date
+        function timeElapsed(date) {
+            const now = new Date();
+            const elapsed = now - new Date(date);
+            const days = Math.floor(elapsed / (1000 * 60 * 60 * 24));
+            return `depuis ${days} jour${days > 1 ? 's' : ''}`;
+        }
+
+        // Charger et afficher les situations des échantillons
+        function loadSituations() {
+            const situationsUl = document.getElementById("situations");
+            situationsUl.innerHTML = "";
+            let situations = JSON.parse(localStorage.getItem("situations")) || [];
+
+            situations.forEach(situation => {
+                const li = document.createElement("li");
+                const elapsed = timeElapsed(situation.date);
+                li.innerHTML = `<strong>${situation.sampleName}</strong><br>Emplacement: ${situation.location}<br>Solution: ${situation.solution}<br>État: ${elapsed}`;
+                situationsUl.appendChild(li);
+            });
+        }
+
+        // Mettre à jour les situations au démarrage
+        document.addEventListener("DOMContentLoaded", loadSituations);
+    </script>
+</head>
+<body class="bg-gray-100 p-6">
+
+    <div class="container mx-auto bg-white p-6 rounded shadow-md">
+        <h2 class="text-2xl mb-4">Situation des Échantillons</h2>
+
+        <!-- Formulaire pour ajouter une situation d'échantillon -->
+        <label for="sampleName" class="block">Nom de l'échantillon :</label>
+        <input type="text" id="sampleName" class="block mb-4 p-2 border border-gray-300 rounded">
+
+        <label for="location" class="block">Emplacement :</label>
+        <input type="text" id="location" class="block mb-4 p-2 border border-gray-300 rounded">
+
+        <label for="solution" class="block">Solution :</label>
+        <input type="text" id="solution" class="block mb-4 p-2 border border-gray-300 rounded">
+
+        <label for="situationDate" class="block">Date :</label>
+        <input type="date" id="situationDate" class="block mb-4 p-2 border border-gray-300 rounded">
+
+        <button onclick="saveSampleSituation()" class="p-2 bg-blue-500 text-white rounded">Enregistrer la situation</button>
+
+        <h3 class="mt-6 text-xl">Situations enregistrées</h3>
+        <ul id="situations" class="mt-4"></ul>
+
+        <!-- Bouton pour revenir à la page principale -->
+        <a href="index.html" class="mt-6 inline-block p-2 bg-green-500 text-white rounded">Retour à la page principale</a>
+    </div>
+
+</body>
+</html>
